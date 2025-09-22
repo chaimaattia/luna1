@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La Luna</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+/* === Reset & Base === */
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Montserrat', sans-serif; }
+body { 
+  background: linear-gradient(to bottom, #000000, #111111); 
+  color:#fff; 
+  overflow-x:hidden; 
+  position:relative;
+}
+
+/* Navbar */
+nav {
+  display:flex; justify-content:center; align-items:center;
+  padding:20px 50px; background:rgba(0,0,0,0.5); backdrop-filter: blur(15px); position:sticky; top:0; z-index:1000;
+}
+nav .logo { font-family:'Playfair Display', serif; font-size:42px; color:#FFD700; text-shadow:0 0 15px #FFD700; }
+
+/* Welcome Overlay */
+#welcome-overlay {
+  display:flex; position:fixed; inset:0; justify-content:center; align-items:center; flex-direction:column;
+  background: radial-gradient(circle at center, rgba(255,215,0,0.1) 0%, rgba(0,0,0,0.95) 100%);
+  backdrop-filter: blur(5px);
+  z-index:2000; text-align:center; animation:fadeIn 1s forwards;
+}
+#welcome-overlay h1 { 
+  font-family:'Playfair Display', serif; font-size:70px; color:#FFD700; text-shadow:0 0 30px #FFD700; margin-bottom:20px; 
+  animation:glow 2s infinite alternate;
+}
+#welcome-overlay p { font-size:24px; color:#fff; margin-bottom:30px; animation:fadeInUp 2s forwards; }
+
+/* Hero */
+.hero { position:relative; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; height:100vh; z-index:1; }
+.hero h1 { font-family:'Playfair Display', serif; font-size:70px; color:#FFD700; text-shadow:0 0 15px #FFD700,0 0 30px #FFD700; animation:heroText 3s ease-in-out infinite alternate; }
+.hero p { font-size:26px; color:#fff; margin:20px 0; animation:fadeInUp 2s forwards; }
+
+/* Moon & Stars */
+.moon { 
+  position:fixed; top:50px; right:50px; width:200px; height:200px; 
+  background:#fff; border-radius:50%; 
+  box-shadow:0 0 100px #fff,0 0 200px #FFD700,0 0 300px #FFD700; 
+  z-index:-1; transform-origin:center; 
+}
+.star { 
+  position:fixed; border-radius:50%; background:white; 
+  animation:twinkle 3s infinite alternate; z-index:-2; 
+}
+
+/* Menu Section */
+section { padding:100px 50px; z-index:1; position:relative; }
+section h2 { font-family:'Playfair Display', serif; font-size:42px; text-align:center; margin-bottom:50px; color:#FFD700; text-shadow:0 0 15px rgba(255,215,0,0.7); }
+
+/* Collapsible Menu */
+.menu-section { margin-bottom:40px; background:rgba(255,215,0,0.05); border-radius:15px; overflow:hidden; }
+.menu-section h3 { background:#FFD700; color:#000; padding:15px 20px; font-size:24px; cursor:pointer; user-select:none; transition:0.3s; }
+.menu-section h3:hover { background:#e6c200; }
+.menu-items { display:none; flex-direction:column; padding:15px 20px; gap:12px; }
+.menu-item { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,215,0,0.3); transition:0.3s; }
+.menu-item:last-child { border-bottom:none; }
+.menu-item span:first-child { font-weight:600; color:#fff; }
+.menu-item span:last-child { font-weight:800; color:#FFD700; }
+.menu-item:hover { transform: scale(1.03); box-shadow: 0 0 15px #FFD700,0 0 30px #FFD700; }
+
+/* Slider */
+.slider-container {
+  position: relative;
+  width: 90%;
+  max-width: 1000px; /* تم زيادة الحد الأقصى للعرض */
+  margin: 40px auto;
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow: 0 0 30px rgba(255,215,0,0.5);
+}
+.slider {
+  position: relative;
+  height: 500px; /* تم زيادة ارتفاع السلايدر */
+}
+.slider img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  top:0;
+  left:0;
+  opacity:0;
+  transition: opacity 1s ease-in-out;
+  border-radius: 20px;
+}
+.slider img.active { opacity:1; }
+.prev, .next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,215,0,0.7);
+  color: #000;
+  border: none;
+  font-size: 30px;
+  padding: 10px 15px;
+  cursor: pointer;
+  border-radius: 50%;
+  user-select: none;
+  transition: 0.3s;
+}
+.prev:hover, .next:hover { background: #FFD700; }
+.prev { left: 15px; }
+.next { right: 15px; }
+.dots { text-align: center; position: absolute; bottom: 15px; width: 100%; }
+.dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin: 0 5px;
+  background: rgba(255,215,0,0.5);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.dot.active { background: #FFD700; }
+
+/* Footer */
+footer { background:rgba(0,0,0,0.8); text-align:center; padding:20px 0; color:#FFD700; font-size:16px; letter-spacing:1px; text-shadow:0 0 5px #FFD700; }
+
+/* Animations */
+@keyframes twinkle { 0%,100% { opacity:0.2; } 50% { opacity:1; } }
+@keyframes fadeInDown {0% {opacity:0; transform:translateY(-50px);} 100% {opacity:1; transform:translateY(0);} }
+@keyframes fadeInUp {0% {opacity:0; transform:translateY(50px);} 100% {opacity:1; transform:translateY(0);} }
+@keyframes fadeIn {0% {opacity:0;} 100% {opacity:1;} }
+@keyframes heroText {0% {transform: translateZ(0px);} 50% {transform: translateZ(25px);} 100% {transform: translateZ(0px);} }
+@keyframes glow { 0% {text-shadow:0 0 10px #FFD700;} 100% {text-shadow:0 0 40px #FFD700;} }
+
+/* === Media Queries للهواتف === */
+@media (max-width: 768px) {
+  nav { padding: 15px 20px; }
+  nav .logo { font-size: 32px; }
+  #welcome-overlay h1 { font-size: 40px; margin-bottom: 15px; text-shadow:0 0 20px #FFD700; }
+  .hero h1 { font-size: 36px; text-shadow:0 0 10px #FFD700,0 0 20px #FFD700; }
+  .hero p { font-size: 20px; margin: 15px 0; }
+  section { padding: 60px 20px; }
+  section h2 { font-size: 32px; margin-bottom: 30px; }
+  .menu-section h3 { font-size: 20px; padding: 12px 15px; }
+  .menu-items { padding: 12px 15px; }
+  .menu-item span:first-child, .menu-item span:last-child { font-size: 16px; }
+  .slider { height: 350px; } /* تم زيادة ارتفاع الهواتف */
+  .prev, .next { font-size: 24px; padding: 8px 12px; }
+  footer { font-size: 14px; padding: 15px 10px; }
+}
+@media (max-width: 480px) {
+  #welcome-overlay h1 { font-size: 30px; }
+  .hero h1 { font-size: 28px; }
+  .hero p { font-size: 16px; }
+  .menu-section h3 { font-size: 18px; }
+  .slider { height: 250px; } /* تم زيادة ارتفاع الهواتف الصغيرة */
+  .prev, .next { font-size: 18px; padding: 6px 10px; }
+  .dot { width: 10px; height: 10px; margin: 0 3px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Welcome Overlay -->
+<div id="welcome-overlay">
+  <h1>LA LUNA </h1>
+</div>
+
+<!-- Moon -->
+<div class="moon"></div>
+
+<!-- Navbar -->
+<nav>
+  <div class="logo">La Luna</div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero">
+  <h1>تجربة الطعام الفاخرة </h1>
+  <p>استمتعوا بأشهى الأطعمة مع جو ساحر وفخامة لا تضاهى</p>
+
+  <!-- Image Slider -->
+  <div class="slider-container">
+    <div class="slider">
+      <img src="laluna.jpg" class="slide active" alt="باستا">
+    </div>
+    <button class="prev">&#10094;</button>
+    <button class="next">&#10095;</button>
+    <div class="dots">
+      <span class="dot active"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </div>
+  </div>
+</section>
+
+<!-- Menu Section -->
+<section id="menu">
+  <h2>قائمة الطعام </h2>
+
+  <!-- Pizza Section -->
+  <div class="menu-section">
+    <h3 onclick="toggleSection(this)">🍕 PIZZA</h3>
+    <div class="menu-items">
+      <div class="menu-item"><span>BOISÉE POULET</span><span>L 550DA | XL 1100DA | XXL 1400DA</span></div>
+      <div class="menu-item"><span>BOISÉE MERGUEZ</span><span>L 550DA | XL 1100DA | XXL 1400DA</span></div>
+      <div class="menu-item"><span>BOISÉE VIANDE</span><span>L 550DA | XL 1100DA | XXL 1400DA</span></div>
+      <div class="menu-item"><span>BOISÉE FUMÉE</span><span>L 600DA | XL 1200DA | XXL 1500DA</span></div>
+      <div class="menu-item"><span>BOISÉE 4 FROMAGES</span><span>L 600DA | XL 1200DA | XXL 1500DA</span></div>
+      <div class="menu-item"><span>BOISÉE CREVETTE</span><span>L 900DA | XL 1500DA | XXL 2000DA</span></div>
+      <div class="menu-item"><span>BOISÉE SAUMON</span><span>2000DA</span></div>
+    </div>
+  </div>
+
+  <!-- Entrées Section -->
+  <div class="menu-section">
+    <h3 onclick="toggleSection(this)">🥗 LES ENTRÉES</h3>
+    <div class="menu-items">
+      <div class="menu-item"><span>SALADE CESAR</span><span>400DA</span></div>
+      <div class="menu-item"><span>CAMEMBERT GRILLE</span><span>400DA</span></div>
+      <div class="menu-item"><span>TOMATE MOZZARELLA</span><span>400DA</span></div>
+      <div class="menu-item"><span>OU PESTO</span><span>500DA</span></div>
+      <div class="menu-item"><span>PLATEAU DE FROMAGES</span><span>500DA</span></div>
+    </div>
+  </div>
+
+  <!-- Pasta Section -->
+  <div class="menu-section">
+    <h3 onclick="toggleSection(this)">🍝 PASTA</h3>
+    <div class="menu-items">
+      <div class="menu-item"><span>SPAGHETTI BOLOGNAISE</span><span>600DA</span></div>
+      <div class="menu-item"><span>SPAGHETTI CARBONARA</span><span>600DA</span></div>
+      <div class="menu-item"><span>PENNE ARRABIATA</span><span>500DA</span></div>
+      <div class="menu-item"><span>TAGLIETELLE AU SAUMON</span><span>900DA</span></div>
+    </div>
+  </div>
+
+  <!-- Drinks Section -->
+  <div class="menu-section">
+    <h3 onclick="toggleSection(this)">🍹 BOISSONS & SMOOTHIES</h3>
+    <div class="menu-items">
+      <div class="menu-item"><span>CAPPUCCINO</span><span>200DA</span></div>
+      <div class="menu-item"><span>CHOCOLAT CHAUD</span><span>200DA</span></div>
+      <div class="menu-item"><span>LATTE MACHIATO</span><span>300DA</span></div>
+      <div class="menu-item"><span>MOJITO CLASSIC</span><span>250DA</span></div>
+      <div class="menu-item"><span>SMOOTHIE FRAISE/MANGUE</span><span>300DA</span></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- Footer -->
+<footer>
+  &copy; 2025 La Luna. جميع الحقوق محفوظة.
+</footer>
+
+<script>
+// Hide welcome overlay automatically
+setTimeout(()=>{ 
+  document.getElementById('welcome-overlay').style.opacity='0'; 
+  setTimeout(()=>{ document.getElementById('welcome-overlay').style.display='none'; },800); 
+},2500);
+
+// Toggle menu sections
+function toggleSection(el){
+  const content = el.nextElementSibling;
+  if(content.style.display==='flex'){ content.style.display='none'; }
+  else{ content.style.display='flex'; content.style.flexDirection='column'; }
+}
+
+// Stars
+for(let i=0;i<100;i++){
+  let star=document.createElement('div');
+  star.className='star';
+  star.style.top=Math.random()*100+'%';
+  star.style.left=Math.random()*100+'%';
+  star.style.width=Math.random()*3+1+'px';
+  star.style.height=star.style.width;
+  star.style.animationDuration=(Math.random()*2+1)+'s';
+  star.style.opacity=Math.random();
+  document.body.appendChild(star);
+}
+
+// Moon rotation
+let moon=document.querySelector('.moon');
+let angle=0;
+setInterval(()=>{ angle+=0.03; moon.style.transform=`rotate(${angle}deg)`; },50);
+
+// Slider
+let slides = document.querySelectorAll('.slider img');
+let dots = document.querySelectorAll('.dot');
+let currentSlide = 0;
+
+function showSlide(index) {
+  slides.forEach((slide,i) => {
+    slide.classList.toggle('active', i===index);
+    dots[i].classList.toggle('active', i===index);
+  });
+  currentSlide = index;
+}
+
+document.querySelector('.next').addEventListener('click', () => {
+  showSlide((currentSlide + 1) % slides.length);
+});
+document.querySelector('.prev').addEventListener('click', () => {
+  showSlide((currentSlide - 1 + slides.length) % slides.length);
+});
+dots.forEach((dot,i) => { dot.addEventListener('click', () => showSlide(i)); });
+setInterval(() => { showSlide((currentSlide + 1) % slides.length); }, 4000);
+</script>
+
+</body>
+</html>
